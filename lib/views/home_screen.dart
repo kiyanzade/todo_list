@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:to_do_app/main.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    MyApp.changeStatusColor(
+        Theme.of(context).colorScheme.primary, Brightness.light);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Get.toNamed("/addTask")!.then((value) => MyApp.changeStatusColor(
+              Theme.of(context).colorScheme.primary, Brightness.light));
+        },
         shape: const CircleBorder(),
         elevation: 0,
         child: const Icon(Icons.add),
