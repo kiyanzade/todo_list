@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:to_do_app/controllers/task_controller.dart';
 import 'package:to_do_app/main.dart';
+
+import '../controllers/textField_controller.dart';
+import 'addTask_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,6 +17,9 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          Get.find<TaskController>().isEditMode = false;
+          Get.find<TextFiledController>().titleController!.text = "";
+          Get.find<TextFiledController>().noteController!.text = "";
           Get.toNamed("/addTask")!.then((value) => MyApp.changeStatusColor(
               Theme.of(context).colorScheme.primary, Brightness.light));
         },
@@ -66,12 +74,14 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 36, top: 5),
-                    child: Text(
-                      "tasks",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 36, top: 5),
+                    child: Obx(() {
+                      return Text(
+                        "${Get.find<TaskController>().tasks.length} tasks",
+                        style: const TextStyle(color: Colors.white),
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -86,28 +96,51 @@ class HomeScreen extends StatelessWidget {
                   topLeft: Radius.circular(18),
                 ),
               ),
-              child: ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () {},
-                      title: const Text("title"),
-                      subtitle: const Text("sub"),
-                      trailing: Checkbox(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4)),
-                        onChanged: (bool? value) {},
-                        value: true,
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return Divider(
-                      color: Colors.black.withOpacity(0.1),
-                      height: 1,
-                    );
-                  },
-                  itemCount: 10),
+              child: Obx(() {
+                return ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        onLongPress: () {
+                          Get.find<TaskController>().removeTask(index);
+                        },
+                        onTap: () {
+                          Get.find<TaskController>().isEditMode = true;
+                          Get.find<TaskController>().indexEdit = index;
+                          Get.find<TextFiledController>()
+                                  .titleController!
+                                  .text =
+                              Get.find<TaskController>().tasks[index].title;
+                          Get.find<TextFiledController>().noteController!.text =
+                              Get.find<TaskController>().tasks[index].note;
+                          Get.toNamed("/addTask");
+                        },
+                        title:
+                            Text(Get.find<TaskController>().tasks[index].title),
+                        subtitle:
+                            Text(Get.find<TaskController>().tasks[index].note),
+                        trailing: Checkbox(
+                          activeColor: Theme.of(context).colorScheme.primary,
+                          side: const BorderSide(color: Colors.grey),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4)),
+                          onChanged: (bool? value) {
+                            var task = Get.find<TaskController>().tasks[index];
+                            task.status = !task.status;
+                            Get.find<TaskController>().tasks[index] = task;
+                          },
+                          value: Get.find<TaskController>().tasks[index].status,
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return Divider(
+                        color: Colors.black.withOpacity(0.1),
+                        height: 1,
+                      );
+                    },
+                    itemCount: Get.find<TaskController>().tasks.length);
+              }),
             ),
           ],
         ),

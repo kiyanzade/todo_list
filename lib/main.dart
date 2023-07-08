@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:to_do_app/bindings.dart';
 import 'package:to_do_app/views/addTask_screen.dart';
 import 'package:to_do_app/views/home_screen.dart';
 
-void main() {
+
+void main() async {
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       getPages: [
         GetPage(name: "/", page: () => const HomeScreen()),
-        GetPage(name: "/addTask", page: () => const AddTaskScreen())
+        GetPage(name: "/addTask", page: () => AddTaskScreen())
       ],
       title: 'Flutter Demo',
       theme: ThemeData(

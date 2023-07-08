@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:to_do_app/controllers/task_controller.dart';
 import 'package:to_do_app/main.dart';
+import 'package:to_do_app/models/task_model.dart';
+
+import '../controllers/textField_controller.dart';
 
 class AddTaskScreen extends StatelessWidget {
   const AddTaskScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    MyApp.changeStatusColor(Colors.white,Brightness.dark);
+    MyApp.changeStatusColor(Colors.white, Brightness.dark);
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -15,13 +20,15 @@ class AddTaskScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(left: 45),
+                    padding: const EdgeInsets.only(left: 45),
                     child: Text(
-                      "New Task",
+                      Get.find<TaskController>().isEditMode
+                          ? "Edit Task"
+                          : "New Task",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -49,6 +56,7 @@ class AddTaskScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: TextField(
+                controller: Get.find<TextFiledController>().titleController,
                 autofocus: true,
                 maxLines: 6,
                 cursorHeight: 42,
@@ -62,8 +70,9 @@ class AddTaskScreen extends StatelessWidget {
             const SizedBox(
               height: 16,
             ),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: Get.find<TextFiledController>().noteController,
+              decoration: const InputDecoration(
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     Icons.bookmark_add,
@@ -79,8 +88,30 @@ class AddTaskScreen extends StatelessWidget {
                     foregroundColor: MaterialStateProperty.all(Colors.white),
                     backgroundColor: MaterialStateProperty.all(
                         Theme.of(context).colorScheme.primary)),
-                onPressed: () {},
-                child: const Text("Add"),
+                onPressed: () {
+                  if (Get.find<TaskController>().isEditMode) {
+                    var task = Get.find<TaskController>()
+                        .tasks[Get.find<TaskController>().indexEdit];
+
+                    task.title =
+                        Get.find<TextFiledController>().titleController!.text;
+
+                    task.note =
+                        Get.find<TextFiledController>().noteController!.text;
+
+                    Get.find<TaskController>()
+                        .tasks[Get.find<TaskController>().indexEdit] = task;
+                  } else {
+                    Get.find<TaskController>().addTask(TaskModel(
+                        Get.find<TextFiledController>().titleController!.text,
+                        Get.find<TextFiledController>().noteController!.text,
+                        false));
+                  }
+
+                  Get.back();
+                },
+                child: Text(
+                    Get.find<TaskController>().isEditMode ? "Edit" : "Add"),
               ),
             )
           ],
