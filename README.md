@@ -1,8 +1,8 @@
-# To Do List App
+# TODO List Project
 
-A new Flutter project.
+A simple todo list project
 
-## Descriptions
+- Persistent data storage using GetX
+- State management using GetX
+- MVC Architecture
 
-This project is a starting point for a Flutter application.
-implement logic by GetX and storge,
